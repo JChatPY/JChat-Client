@@ -1,0 +1,42 @@
+#!/usr/bin/python
+import httplib
+import sys
+
+#get http server ip
+http_server = sys.argv[1]
+#create a connection
+conn = httplib.HTTPConnection(http_server)
+
+while 1:
+    cmd = raw_input('')
+    cmd = cmd.split()
+
+    if cmd[0] == 'exit': #tipe exit to end it
+        break
+    
+    #request command to server
+    if len(cmd)==1:
+        conn.request("GET", "/"+cmd[0])
+    else:
+        if not cmd[0]=="l" or cmd[0]=="c":
+            if sys.platform!="win32":
+                conn.request("GET", "/"+cmd[0]+","+tk+","+"%20".join(cmd[1:]))
+            else:
+                conn.request("GET", "/"+cmd[0]+","+str(tk,"ascii")+","+"%20".join(cmd[1:]))
+        else:
+            conn.request("GET", "/"+cmd[0]+","+cmd[1]+","+"%20".join(cmd[2:]))
+
+    #get response from server
+    rsp = conn.getresponse()
+    
+    #print server response and data
+    data_received = rsp.read()
+    if cmd[0]=="c" or cmd[0] == "l":
+        tk=data_received
+        print(tk)
+        continue
+    if sys.platform!="win32":
+        print(str(data_received))
+    else:
+        print(str(data_received,"ascii"))    
+conn.close()
